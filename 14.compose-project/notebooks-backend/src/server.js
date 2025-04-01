@@ -8,7 +8,7 @@ app.use(bodyParser.json())
 
 //routes
 app.get('/', (req, res) => {
-    res.json({message: 'Hi btother, from notebooks!!!'})
+    res.json({message: 'Hi there, from notebooks!'})
 })
 //app.use('/api/notebooks', notebooksRouter)
 

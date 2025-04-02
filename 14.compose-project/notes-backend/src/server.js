@@ -1,16 +1,14 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import mongoose from 'mongoose';
+import notesRouter from './routes.js'
 
 const port = process.env.PORT;
 const app = express();
 app.use(bodyParser.json())
 
 //routes
-app.get('/api/notes', (req, res) => {
-    res.json({message: 'Hi, from notes!'})
-})
-//app.use('/api/notes', notesRouter)
+app.use('/api/notes', notesRouter)
 
 //db connect
 mongoose.connect(process.env.DB_URL)

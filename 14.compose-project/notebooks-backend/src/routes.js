@@ -41,7 +41,7 @@ notebookRouter.get('/', async (req, res) => {
 //Retrieve a notebooks by id: GET '/:id'
 notebookRouter.get('/:id', validateId, async (req, res) => {    
     try {
-        const resp = await NotebookModel.findById(req.parms.id)
+        const resp = await NotebookModel.findById(req.params.id)
         if(!resp) return res.status(404).json({error: 'Id not found'})
         return res.status(200).json({data: resp})
     } catch (error) {

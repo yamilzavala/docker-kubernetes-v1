@@ -7,7 +7,7 @@ const app = express();
 app.use(bodyParser.json())
 
 //routes
-app.get('/', (req, res) => {
+app.get('/api/notebooks', (req, res) => {
     res.json({message: 'Hi there, from notebooks!'})
 })
 //app.use('/api/notebooks', notebooksRouter)

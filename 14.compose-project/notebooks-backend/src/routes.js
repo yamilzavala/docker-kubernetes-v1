@@ -4,9 +4,13 @@ import mongoose from 'mongoose';
 
 const notebookRouter = express.Router();
 
-// notebookRouter.get('/', (req, res) => {
-//     res.json({message: 'Hi there, from notebooks!'})
-// })
+//middlewares start
+function validateId(req, res, next) {
+    const {id} = req.params;
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({error: 'Id not found'})
+    next()
+}
+//middlewares end
 
 //Create a new notebooks: POST '/'
 notebookRouter.post('/', async (req, res) => {
@@ -35,11 +39,9 @@ notebookRouter.get('/', async (req, res) => {
 })
 
 //Retrieve a notebooks by id: GET '/:id'
-notebookRouter.get('/:id', async (req, res) => {    
+notebookRouter.get('/:id', validateId, async (req, res) => {    
     try {
-        const {id} = req.params;
-        if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({error: 'Id not found'})
-        const resp = await NotebookModel.findById(id)
+        const resp = await NotebookModel.findById(req.parms.id)
         if(!resp) return res.status(404).json({error: 'Id not found'})
         return res.status(200).json({data: resp})
     } catch (error) {
@@ -48,12 +50,10 @@ notebookRouter.get('/:id', async (req, res) => {
 })
 
 //Update a notebooks: PUT '/:id'
-notebookRouter.put('/:id', async (req, res) => {       
-    try {
-        const {id} = req.params;
-        const {name, description} = req.body;
-        if(!name || !description) return res.status(500).json({message: 'Name and Description are required'})
-        const resp = await NotebookModel.findByIdAndUpdate(id, {name, description}, { new: true })
+notebookRouter.put('/:id', validateId, async (req, res) => {       
+    try {       
+        const {name, description} = req.body;        
+        const resp = await NotebookModel.findByIdAndUpdate(req.params.id, {name, description}, { new: true })
         if(!resp) return res.status(404).json({error: 'Id not found'})
         return res.status(201).json({message: 'Successfull notebooks update', data: resp})
     } catch (error) {
@@ -63,11 +63,9 @@ notebookRouter.put('/:id', async (req, res) => {
 
 
 //Delete a notebooks by id: DELETE '/:id'
-notebookRouter.delete('/:id', async (req, res) => {
+notebookRouter.delete('/:id', validateId, async (req, res) => {
     try {
-        const {id} = req.params;
-        if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({error: 'Id not found'})
-        const resp = await NotebookModel.findByIdAndDelete(id);
+        const resp = await NotebookModel.findByIdAndDelete(req.params.id);
         if(!resp) return res.status(404).json({error: 'Id not found'})
         return res.sendStatus(204);
     } catch (error) {

@@ -1,0 +1,41 @@
+# For documentation, equivalent to the imperative command:
+# kubectl run nginx-pod --image=nginx:1.27.0
+
+# For check how imperative will be write into declarative
+# kubectl run nginx-pod --image=nginx:1.27.0 --dry-run=client -o yaml
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: nginx-pod
+  labels: 
+    app: nginx
+spec:
+  containers:
+  - image: nginx:1.27.0
+    name: nginx-container
+    ports:
+    - containerPort: 80
+
+---
+# For documentation, equivalent to the imperative command:
+# kubectl expose pod nginx-pod --type=NodePort --port=80
+
+# For migrate from imperative into declarative
+# kubectl expose pod nginx-pod --type=NodePort --port=80 --dry-run=client -o yam
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+  labels:
+    app: nginx
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: nginx
+

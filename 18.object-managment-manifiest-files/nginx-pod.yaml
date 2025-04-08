@@ -1,0 +1,18 @@
+# For documentation, equivalent to the imperative command:
+# kubectl run nginx-pod --image=nginx:1.27.0
+
+# For check how imperative will be write into declarative
+# kubectl run nginx-pod --image=nginx:1.27.0 --dry-run=client -o yaml
+
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: nginx-pod
+  labels: 
+    app: nginx
+spec:
+  containers:
+  - image: nginx:1.27.0
+    name: nginx-container
+    ports:
+    - containerPort: 80

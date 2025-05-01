@@ -18,6 +18,8 @@ spec:
     - containerPort: 80
 
 ---
+# These three dashes inform kubernetes that exist another object next
+
 # For documentation, equivalent to the imperative command:
 # kubectl expose pod nginx-pod --type=NodePort --port=80
 

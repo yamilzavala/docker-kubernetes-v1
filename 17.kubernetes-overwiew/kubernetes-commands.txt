@@ -53,6 +53,7 @@ kubectl [get | describe | logs] ...
 DECLARATIVE COMMANDS WITH files
 ########
 kubectl apply  -f <filename>
+kubectl apply  -f <dirname>
 kubectl diff   -f <filename>
 kubectl delete -f <filename>
 
@@ -80,3 +81,8 @@ spec:
 
 Luego ejecutar:
     kubectl apply -f nginx-pod.yaml
+
+================================================================================================================================================================
+
+# Para ver como se escribiria en forma imperativa con un file, se puede ejecutar el siguiente comando:
+# kubectl run nginx-pod --image=nginx:1.27.0 --dry-run=client -o yaml

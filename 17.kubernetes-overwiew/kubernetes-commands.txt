@@ -1,0 +1,82 @@
+Los pods no pueden ser accesibles si estan fuera del cluster de kubernetes.
+Es decir, si creo un pod y quiero accederlo desde mi local machine, no sera posible.
+Si creo dos pods, ellos van a poder comunicarse por su numero de ip. El problema es que ese ip cambio si eliminamos el pod.
+La solucion es agregar un service que exponga ese pod con un ip unico y estatico. Entonces la comunicacion se puede hacer por ese IP o por el nombre del service. 
+
+Lo ideas es que para crear un pod la Imagen este subida a un repositorio (como Docker Hub)
+✔️ Es la forma más común y recomendada.
+Kubernetes puede hacer pull automáticamente de repositorios como:
+    Docker Hub
+    GitHub Container Registry
+    Google Container Registry
+    Amazon ECR
+Entonces los pasos recomendados seria:
+    docker build -t imageName .
+    docker push imageName
+    kubectl run <POR-NAME> --image=<IMAGE-NAME-FROM-REPO:VERSION>
+
+================================================================================================================================================================
+
+IMPERATIVE COMMANDS WITH kubectl
+########
+GET
+    kubectl get pods
+    kubectl get service
+
+CREATE
+    kubectl run <POD-NAME> --image=<IMAGE-NAME:VERSION>
+
+DESCRIBE
+    kubectl describe <RESOURCE> <NAME>
+
+LOGS    
+    kubectl logs <NAME-POD>
+
+DELETE
+    kubectl delete pod --force=true <NAME-POD>
+
+SERVICE - EXPOSE POD
+    kubectl expose pod <POD-NAME> --type=NodePort --port=80
+
+================================================================================================================================================================
+
+IMPERATIVE COMMANDS WITH files (Manifest files)
+########
+kubectl create  -f <filename>
+kubectl delete  -f <filename>
+kubectl replace -f <filename>
+
+kubectl [get | describe | logs] ...
+
+================================================================================================================================================================
+
+DECLARATIVE COMMANDS WITH files
+########
+kubectl apply  -f <filename>
+kubectl diff   -f <filename>
+kubectl delete -f <filename>
+
+kubectl [get | describe | logs] ...
+
+================================================================================================================================================================
+MANIFEST FILE para kubectl
+########
+Ejemplo básico de un manifest file YAML que puedes aplicar con kubectl apply -f archivo.yaml
+
+--------------
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    app: web
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx:1.25
+      ports:
+        - containerPort: 80
+--------------
+
+Luego ejecutar:
+    kubectl apply -f nginx-pod.yaml

@@ -1,0 +1,69 @@
+### ReplicaSet ###
+Un ReplicaSet en Kubernetes es un controlador cuyo propósito principal es mantener un número estable de pods en ejecución en todo momento (en base a un template configurado en un file.yaml).
+Es decir, se asegura de que siempre haya una cantidad específica de réplicas (instancias) de un pod ejecutándose.
+
+Funciones principales de un ReplicaSet:
+> Asegura disponibilidad: si un pod falla o es eliminado, el ReplicaSet lo reemplaza automáticamente.
+> Escalabilidad: puedes cambiar el número de réplicas (horizontal scaling) fácilmente.
+> Alta disponibilidad y tolerancia a fallos.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo básico de ReplicaSet en YAML:
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: mi-replicaset
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mi-app
+  template:
+    metadata:
+      labels:
+        app: mi-app
+    spec:
+      containers:
+      - name: mi-contenedor
+        image: nginx
+        ports:
+        - containerPort: 80
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Cosas clave:
+> replicas: número de pods que quieres mantener activos.
+> selector: le dice al ReplicaSet qué pods debe controlar.
+> template: define el contenido de los pods que se van a crear.
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Desventajas de replicaset:
+  Si cambiamos la imagen del template en base a la cual se crearan los pods, los pods en estado running NO se actualzan automaticamente.
+  Solo los nuevos pods se crearan con la nueva imagen del template.
+  Ejemplo:
+    Tengo 3 pods corriendo en base a una imagen "nginx:1.27.0".
+    Cambio mi replicaset file y pongo otra imagen: "nginx:1.27.0-alpine"
+    Aplico la nueva configuracion: kubectl apply -f <REPLICASET-NAME.yaml>
+    Borro uno de los pods: kubectl delete pod <PODID> ==> kubernetes recreara el nuevo pod con la imagen nueva "nginx:1.27.0-alpine"; pero los
+    otros pods que siguen corriendo, siguen con la imagen vieja "nginx:1.27.0"
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Configurar replica set:
+  kubectl apply -f <REPLICASET-NAME.yaml>
+
+Ver replicas set:
+  kubectl get rs
+
+Ver imagen en base a cual esta creado un pod:
+   kubectl describe pod <POD-NAME> | grep Image
+
+Observar los pods:
+  kubectl get pod --watch
+
+Observar los replicaset:
+  kubectl get rs --watch
+

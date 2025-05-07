@@ -1,0 +1,119 @@
+### Deployments ###
+
+Los Deployments solucionan las limitaciones de los ReplicaSets.
+Aunque un ReplicaSet puede mantener un número fijo de pods en ejecución, no gestiona actualizaciones de manera segura (como cambiar la versión de una app).
+
+Deployments se apoyan en ReplicaSets, pero añaden:
+> Actualizaciones automáticas y controladas (rolling updates).
+> Reversiones (rollback) en caso de errores.
+> Mejor gestión del ciclo de vida de la app.
+
+crear y manejar Deployments:
+    kubectl create deployment mi-app --image=miimagen:v1
+
+Rollouts y cómo depurar cuando fallan
+Un rollout es el proceso de actualizar los pods a una nueva versión (por ejemplo, una nueva imagen de Docker).
+Si algo sale mal:
+> Puedes ver el estado con:
+    kubectl rollout status deployment mi-app
+> Revertir con:
+    kubectl rollout undo deployment mi-app
+> Revisar eventos y logs con:
+    kubectl describe pod [nombre] 
+    kubectl logs [nombre]
+
+Escalar Deployments:
+    kubectl scale deployment mi-app --replicas=5
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Ejemplo de un Deployment file:
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+  annotations:
+    "kunernetes.io/change-cause": "update nginx to tag 1.27.0-alpine" # 👉 Define descripcion para un update de imagen
+spec:
+  replicas: 3  # 👉 Define cuántos Pods queremos
+  selector:
+    matchLabels:
+      app: nginx  # 👉 Coincide con los Pods que este Deployment controlará
+  template:
+    metadata:
+      labels:
+        app: nginx  # 👉 Las etiquetas que deben tener los Pods creados
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.21.6  # 👉 Imagen del contenedor
+        ports:
+        - containerPort: 80  # 👉 Puerto que expone el contenedor
+
+¿Qué hace este Deployment?
+Crea 3 Pods corriendo la imagen nginx:1.21.6.
+Usa un ReplicaSet en el fondo (¡sin que tú tengas que definirlo directamente!).
+Garantiza que si un Pod falla, se reinicia automáticamente.
+Si cambias la imagen (por ejemplo a nginx:1.22.0) y haces kubectl apply, Kubernetes hará una actualización progresiva (rolling update).
+Puedes escalar fácil con:
+  kubectl scale deployment nginx-deployment --replicas=5
+
+-----------------------------------------------------------------------------------------------------------------------------
+
+Ventajas de deploys sobre replicasets:
+
+Si cambiamos la imagen del template en base a la cual se crearan los pods (deployfile.yaml), los pods en estado se iran actualzando automaticamente gradualmente.
+Ejemplo:
+    Tengo 3 pods corriendo en base a una imagen "nginx:1.27.0" definida en el deployfile.yaml.
+    Cambio mi deployfile y pongo otra imagen: "nginx:1.27.0-alpine"
+    Aplico la nueva configuracion: kubectl apply -f <DEPLOYFILE-NAME.yaml> ==> gradualmente se iran creando nuevos pods en otro replicaset nuevo, con la nueva configuracion.
+    Cada vez que se cree un nuevo pod en el nuevo rs, se eliminara dicho pod del viejo rs.
+    
+-----------------------------------------------------------------------------------------------------------------------------
+
+Aplicar un deploy basado en un archivo:
+  kubectl apply -f <DEPLOY-FILE.yaml>
+
+Obtener los deploys:
+  kubectl get deploy
+
+Obtener los replicas set:
+  kubectl get rs
+
+Ver detalles de nuestro deploy:
+  kubectl describe <DEPLOY-NAME>
+
+Ver detalles de la actualizacion de un pod:
+  kubectl describe <PODID> | grep Image
+
+Para hacer un rollback a la version anterior del replica set antiguo
+  kubectl rollout undo deployment <DEPLOYMENT-NAME>
+
+Si queremos volver a aplicar los cambios para la version mas nueva del deploy, simplemente ejecutamos:
+  kubectl apply -f <DEPLOY-FILE.yaml>
+
+Para ver el historico
+  kubectl rollout history deployment <DEPLOYMENT-NAME>
+
+Para ver el historico y el archivo que simularia ese historico
+  kubectl rollout history deployment <DEPLOYMENT-NAME> --revision=3 -o yaml
+
+Para escalar:
+  kubectl scale deployment <DEPLOYMENT-NAME> --replicas=10
+Si en nuestro <DEPLOY-FILE.yaml> tenemos configurado por ejemplo "replicas: 5", cuando volvamos a correr el comando "kubectl apply -f <DEPLOY-FILE.yaml>", se volveran a 5 pods en lugar de 10 pods.
+
+Para reiniciar:
+  kubectl scale deployment <DEPLOYMENT-NAME> --replicas=0
+  kubectl scale deployment <DEPLOYMENT-NAME> --replicas=5
+
+Para agregar una anotacion sobre un update en el DEPLOYFILE.yaml
+  kebectl annotate deployment <DEPLOYMENT-NAME> 'Kubernetes.io/change-cause'='update nginx to tag 1.27.0-alpine'
+
+Para ver el status del deploy:
+  kubectl rollout status deployment <DEPLOYMENT-NAME>
+
+Para borrar el deploy:
+  kubectl delete -f <DEPLOYMENT-FILE-NAME.yaml>

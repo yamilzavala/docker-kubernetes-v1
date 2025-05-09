@@ -1,0 +1,6 @@
+Para generar trafico:
+./traffic-gen.sh "localhost:8080/api" 0.5
+
+docker build -t yamil189/traffic-generator:1.0.0 .
+docker run yamil189/traffic-generator:1.0.0 "localhost:8080/api" 0.5
+docker push yamil189/traffic-generator:1.0.0

@@ -9,5 +9,6 @@ spec:
     - name: traffic-generator
       image: yamil189/traffic-generator:1.0.0
       args:
-        - '10.1.0.112/api'
+        # - '10.99.21.70/api' => replace with the service ip or service's name
+        - color-api-clusterip/api
         - '0.5'

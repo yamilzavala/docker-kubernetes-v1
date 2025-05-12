@@ -1,12 +1,25 @@
 creamos pods en base al archivo de deployment:
 > kubectl apply -f color-api-deployment.yaml
-
 > kubectl get pods
 > kubectl get deploy
 > kubectl get rs
 > kubectl describe pod <RUNNING-COLOR-API-PODNAME> ==> to take the IP for the following command (example: 10.1.0.112)
+
 > kubectl apply -f traffic-generator.yaml 
 > kubectl get pods 
 > kubectl logs -f traffic-generator
+
 > kubectl delete pod <RUNNING-COLOR-API-PODNAME>(example: color-api-deployment-6db7cbfb46-7zrd5) ==> detine los logs
 > kubectl delete pod traffic-generator
+
+> kubectl apply -f color-api-clusterip.yaml
+> kubectl get svc ==> copy the CLUSTER-IP, go to traffic-generator.yaml and replace in "args" the CLUSTER-IP copied
+
+> kubectl apply -f traffic-generator.yaml
+> kubectl logs -f traffic-generator
+> kubectl delete pod <RUNNING-COLOR-API-PODNAME> ==> no teniene los logs, ya que el ip expuesto desde el traffic-generator.yaml es un IP estatico y balancea la carga. La unica forma de detener los logs, seria borrando todos los pods con "kubectl delete -f color-api-deployment.yaml"
+
+> kubectl apply -f color-api-deployment.yaml ==> no mostrara mas logs, tenemos que borrar el traffict-generator
+> kubectl delete --force -f traffic-generator.yaml
+> kubectl apply -f traffic-generator.yaml ==> volvemos a crear el generator para ver los logs
+> kubectl logs -f traffic-generator

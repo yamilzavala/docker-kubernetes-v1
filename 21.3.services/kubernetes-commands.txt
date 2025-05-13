@@ -12,6 +12,7 @@ creamos pods en base al archivo de deployment:
 > kubectl delete pod <RUNNING-COLOR-API-PODNAME>(example: color-api-deployment-6db7cbfb46-7zrd5) ==> detine los logs
 > kubectl delete pod traffic-generator
 
+Para hablar con un pod DENTRO del cluster
 > kubectl apply -f color-api-clusterip.yaml
 > kubectl get svc ==> copy the CLUSTER-IP, go to traffic-generator.yaml and replace in "args" the CLUSTER-IP copied
 
@@ -23,3 +24,19 @@ creamos pods en base al archivo de deployment:
 > kubectl delete --force -f traffic-generator.yaml
 > kubectl apply -f traffic-generator.yaml ==> volvemos a crear el generator para ver los logs
 > kubectl logs -f traffic-generator
+
+Para hablar con un pod FUERA del cluster
+> kubectl apply -f color-api-nodeport.yaml 
+> kubectl get svc
+> kubectl get nodes -o wide
+> minikube start
+> minikube service color-api-nodeport --url ==> give us the url to chat externally with the pods from browser
+
+
+External name services
+> kubectl apply -f google-extname.yaml
+> kubectl get svc
+> kubectl apply -f traffic-generator.yaml 
+> kubectl exec -it traffic-generator -- sh 
+> kubectl delete --force -f . ==> delete all in current directory
+
